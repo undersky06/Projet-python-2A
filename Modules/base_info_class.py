@@ -1,10 +1,7 @@
-from dataclasses import fields
 import functools
-from domain.entities.article import Article
 import pandas as pd
 from typing import List, Optional
 
-ARTICLE_FIELDS = {f.name for f in fields(Article)}
 REQUIRED_FIELDS = {
     "title",
     "abstract",
@@ -18,7 +15,7 @@ REQUIRED_FIELDS = {
 }
 
 
-class ArticleBaseQuery  :
+class ArticleBaseQuery:
 
     def __init__(self, file_path: str):
         self.file_path = file_path
