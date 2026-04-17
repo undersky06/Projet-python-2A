@@ -1,0 +1,22 @@
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+select = [
+    "E",  # pycodestyle errors
+    "F",  # pyflakes
+    "I",  # isort (imports)
+    "B",  # bugbear
+]
+
+ignore = [
+    "E501"  # line too long handled by black
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

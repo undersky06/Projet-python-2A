@@ -1,8 +1,8 @@
+from typing import Optional, Union
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-
-from typing import Union, Optional
 from wordcloud import WordCloud
 
 
@@ -13,9 +13,7 @@ class GraphicDrawer:
     def _to_dataframe(data: Union[pd.DataFrame, dict]) -> pd.DataFrame:
         """Convert dict to DataFrame if necessary."""
         if isinstance(data, dict):
-            return pd.DataFrame(
-                list(data.items()), columns=["Category", "Count"]
-            )
+            return pd.DataFrame(list(data.items()), columns=["Category", "Count"])
         return data
 
     @staticmethod
