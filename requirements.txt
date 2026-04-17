@@ -17,3 +17,5 @@ ipywidgets
 umap-learn
 plotly
 nbformat
+hdbscan
+scikit-optimize
