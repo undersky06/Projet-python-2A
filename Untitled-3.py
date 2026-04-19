@@ -16,6 +16,8 @@ warnings.filterwarnings("ignore")
 URL = "https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-02-25/article_dat.csv"
 df = pd.read_csv(URL, low_memory=False)
 
+# ── 2. Nettoyage ────────
+#retire les na ? retire les duplications ? regarder si c'est bien renseigné, pas de val aberrante. 
 print("=" * 60)
 print("APERÇU GÉNÉRAL")
 print("=" * 60)
