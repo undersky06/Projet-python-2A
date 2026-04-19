@@ -1,6 +1,7 @@
 import functools
-import pandas as pd
 from typing import List, Optional
+
+import pandas as pd
 
 REQUIRED_FIELDS = {
     "title",
@@ -47,12 +48,14 @@ class ArticleBaseQuery:
     # wrappers for ensuring immutability and type safety
     def ensure_dataframe(func):
         """Decorator to ensure the method returns a DataFrame"""
+
         @functools.wraps(func)  # Preserve function metadata (name, docstring)
         def wrapper(self, *args, **kwargs):
             result = func(self, *args, **kwargs)
             if not isinstance(result, pd.DataFrame):
                 raise TypeError("Expected a DataFrame")
             return result
+
         return wrapper
 
     def ensure_columns_exist(columns: List[str]):
@@ -71,15 +74,18 @@ class ArticleBaseQuery:
                 return func(self, *args, **kwargs)
 
             return wrapper
+
         return decorator
 
     def validate_required_fields(func):
         """Decorator to ensure reqquired fields are present in the dataframe"""
+
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             df = self._load_dataframe()
             self._validate_required_fields(df)
             return func(self, *args, **kwargs)
+
         return wrapper
 
     def _validate_required_fields(self, df: pd.DataFrame):
@@ -95,6 +101,7 @@ class ArticleBaseQuery:
         """Utility method to display columns in the dataframe"""
         df = self._load_dataframe()
         print(f"Columns in data: {list(df.columns)}")
+
     # getters with optional filtering by title or doi
     # @validate_required_fields
     @ensure_dataframe
@@ -193,7 +200,7 @@ class ArticleBaseQuery:
     @ensure_dataframe
     def get_study_absracts(self, prefer_doi: bool = True) -> set[str]:
         """Get unique study abstracts from the articles"""
-        key = 'doi' if prefer_doi else 'title'
+        key = "doi" if prefer_doi else "title"
 
         abstracts_df = self.select_columns([key, "abstract"])
         abstracts_df = abstracts_df.dropna(subset=[key, "abstract"])
@@ -209,8 +216,7 @@ class ArticleBaseQuery:
         missing_columns = set(columns) - set(df.columns)
         if missing_columns:
             raise ValueError(
-                "Missing columns in data:"
-                f" {', '.join(sorted(missing_columns))}"
+                "Missing columns in data:" f" {', '.join(sorted(missing_columns))}"
             )
         return df[columns]
 

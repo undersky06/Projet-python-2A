@@ -1,7 +1,9 @@
-from Modules.base_info_class import ArticleBaseQuery
-import pandas as pd
-from collections import Counter
 import re
+from collections import Counter
+
+import pandas as pd
+
+from Modules.base_info_class import ArticleBaseQuery
 
 
 class ArticleService:
@@ -46,10 +48,7 @@ class ArticleService:
         return df["data_source"].value_counts().sort_index()
 
     def count_word_frequencies(
-        self,
-        text_column: str = "abstract",
-        top_n: int = 20,
-        *args, **kwargs
+        self, text_column: str = "abstract", top_n: int = 20, *args, **kwargs
     ):
         """Count word frequencies in a specific text column"""
         df = self.filter_articles(*args, **kwargs)
@@ -105,13 +104,17 @@ class ArticleService:
     def clean_text(self, text: str) -> str:
         """Basic text cleaning function"""
         text = text.lower()  # Convert to lowercase
-        text = re.sub(r"\s+", " ", text)  # Replace multiple whitespace with single space
-        text = re.sub(r"\S@\S+", " ", text) # Remove email addresses
-        text = re.sub(r"http\S+", " ", text) # Remove URLs
-        text= re.sub(r"<.*?>", " ", text) # Remove HTML tags
+        text = re.sub(
+            r"\s+", " ", text
+        )  # Replace multiple whitespace with single space
+        text = re.sub(r"\S@\S+", " ", text)  # Remove email addresses
+        text = re.sub(r"http\S+", " ", text)  # Remove URLs
+        text = re.sub(r"<.*?>", " ", text)  # Remove HTML tags
         return text.strip()
 
-    def apply_clean_text_data(self, text_column: str = "abstract", *args, **kwargs) -> pd.DataFrame:
+    def apply_clean_text_data(
+        self, text_column: str = "abstract", *args, **kwargs
+    ) -> pd.DataFrame:
         """Clean text data in a specific column for NLP tasks"""
         df = self.filter_articles(*args, **kwargs)
         print(df.columns)
