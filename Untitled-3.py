@@ -118,6 +118,8 @@ for label, count in domain_series.items():
 
 # ── 8. Groupes raciaux ────────────────────────────────────────────────────────
 
+# Attention le dropna supprime toutes les lignes avec au moins 1 NA, nous on veut supprimer les NA par colonne n'est ce pas 
+
 print("\n" + "=" * 60)
 print("GROUPES RACIAUX MENTIONNÉS (race1 à race8)")
 print("=" * 60)
