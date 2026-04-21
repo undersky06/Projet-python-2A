@@ -1,3 +1,38 @@
+"""
+UMAP Dimension Reduction Utility
+===============================
+
+This module provides a high-level wrapper around UMAP for dimensionality
+reduction of labeled or unlabeled embeddings. It supports:
+
+- DataFrames with custom indices (e.g., image IDs)
+- Normalization before reduction
+- 2D or 3D interactive visualization using Plotly
+
+Classes
+-------
+UmapDimensionReducer
+    Perform UMAP reduction and optional visualization.
+
+Dependencies
+------------
+- pandas
+- plotly
+- umap-learn
+- scikit-learn (normalize)
+
+Example
+-------
+>>> reducer = UmapDimensionReducer(
+...     n_neighbors=15,
+...     n_components=2,
+...     data=df_embeddings
+... )
+>>> X_2d = reducer.fit_transform()
+>>> fig = reducer.plot(dims=2, labels="index")
+>>> fig.show()
+"""
+
 import pandas as pd
 import plotly.express as px
 import umap
@@ -6,15 +41,33 @@ from sklearn.preprocessing import normalize
 
 class UmapDimensionReducer:
     """
-    Réduction de dimension avec UMAP pour données étiquetées ou non.
+    UMAP-based dimensionality reduction for embedding matrices.
 
-    Notes
-    -----
-    Compatible avec des embeddings sous forme :
+    Parameters
+    ----------
+    n_neighbors : int, optional (default=10)
+        Number of neighbors used by UMAP to build the local manifold structure.
+        Must be a strictly positive integer.
+    min_dist : float, optional (default=0.1)
+        Minimum distance between embedded points. Must be in [0, 1].
+    metric : str, optional (default="cosine")
+        Distance metric used by UMAP.
+    n_components : int, optional (default=10)
+        Target dimensionality of the reduced space.
+    random_state : int, optional (default=42)
+        Seed for reproducibility.
+    data : pandas.DataFrame or None, optional
+        Input embedding matrix. If provided as a DataFrame, its index is preserved
+        and used in visualizations.
 
-        df = pd.DataFrame(emb_matrix, index=img_ids)
-
-    Les identifiants sont alors gérés via l'index.
+    Attributes
+    ----------
+    reducer : umap.UMAP or None
+        Internal UMAP model instance.
+    _X_reduced : numpy.ndarray or None
+        Reduced embedding matrix after calling `fit_transform`.
+    data : pandas.DataFrame or None
+        Original input data.
     """
 
     def __init__(
@@ -42,6 +95,19 @@ class UmapDimensionReducer:
         self._X_reduced = None
 
     def reduce(self):
+        """
+        Initialize the UMAP reducer with the configured parameters.
+
+        Returns
+        -------
+        self : UmapDimensionReducer
+            The instance itself, with the UMAP reducer created.
+
+        Notes
+        -----
+        This method does not perform any computation. It only instantiates
+        the UMAP model. The actual reduction happens in `fit_transform`.
+        """
         self.reducer = umap.UMAP(
             n_neighbors=self.n_neighbors,
             n_components=self.n_components,
@@ -53,12 +119,24 @@ class UmapDimensionReducer:
 
     def fit_transform(self):
         """
-        Applique UMAP sur les données.
+        Apply UMAP dimensionality reduction to the input data.
 
-        Retour
+        Returns
+        -------
+        numpy.ndarray of shape (n_samples, n_components)
+            The reduced embedding matrix.
+
+        Raises
         ------
-        X_reduced : numpy.ndarray
-            Matrice réduite (n_samples x n_components).
+        ValueError
+            If no data has been provided.
+        RuntimeError
+            If UMAP reducer has not been initialized (rare, auto-handled).
+
+        Notes
+        -----
+        - Input data is L2-normalized before reduction.
+        - If `reduce()` has not been called, it is invoked automatically.
         """
         if self.reducer is None:
             self.reduce()
@@ -79,7 +157,37 @@ class UmapDimensionReducer:
         title: str = "Projection UMAP",
     ):
         """
-        Visualise la projection UMAP avec Plotly.
+        Visualize the UMAP projection using Plotly.
+
+        Parameters
+        ----------
+        dims : int, optional (default=2)
+            Number of dimensions to plot (2 or 3).
+        labels : str or None, optional
+            Label source for coloring points:
+            - "index" : use DataFrame index
+            - column name : use a column from `data`
+            - None : no coloring
+        title : str, optional (default="Projection UMAP")
+            Title of the Plotly figure.
+
+        Returns
+        -------
+        plotly.graph_objects.Figure
+            Interactive scatter plot (2D or 3D).
+
+        Raises
+        ------
+        RuntimeError
+            If `fit_transform` has not been called.
+        ValueError
+            If `dims` is not 2 or 3.
+            If `labels` is invalid.
+
+        Notes
+        -----
+        - The DataFrame index is used as hover labels.
+        - For 3D visualization, the first three UMAP components are used.
         """
         if self._X_reduced is None:
             raise RuntimeError("Appeler `fit_transform` avant l'affichage.")
